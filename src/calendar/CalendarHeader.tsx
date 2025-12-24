@@ -8,10 +8,12 @@ interface Props {
   level: 'year' | 'month' | 'week' | 'day';
   onBack: () => void;
   engine: CalendarEngine;
+  visibleDate: Date;
 }
 
-export default function CalendarHeader({ level, onBack, engine }: Props) {
-  const title = level === 'year' ? engine.getYear().toString() : engine.getTitle(level);
+export default function CalendarHeader({ level, onBack, engine, visibleDate }: Props) {
+  const title = level === 'year' ? '' : engine.getTitle(level, visibleDate);
+  console.log('title', title, visibleDate);
 
   return (
     <View style={styles.header}>

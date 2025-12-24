@@ -23,16 +23,27 @@ export type ViewMode = 'year' | 'month' | 'week' | 'day';
 
 export class CalendarEngine {
   date: Date;
+  anchorDate: Date;
   config: CalendarConfig;
 
   constructor(date: Date) {
     this.date = date;
+    this.anchorDate = date;
     this.config = getConfig();
   }
 
   // 更新配置
   updateConfig(newConfig: Partial<CalendarConfig>) {
     this.config = { ...this.config, ...newConfig };
+  }
+
+  //设置锚点日期（更新用）
+  setAnchorDate(d: Date){
+    this.anchorDate = d;
+  }
+
+  getAnchorDate(){
+    return this.anchorDate;
   }
 
   // 年视图：返回12个月
@@ -118,19 +129,21 @@ export class CalendarEngine {
     return this.date.getFullYear();
   }
 
-  getTitle(viewMode: ViewMode) {
+  getTitle(viewMode: ViewMode, visibleDate: Date) {
+    const currentDate = visibleDate;
+    console.log('currentDate', currentDate);
     const locale = LOCALES[this.config.language] || zhCN;
 
     switch (viewMode) {
       case 'month':
         // 2025年3月
-        return format(this.date, 'yyyy年M月', { locale });
+        return format(currentDate, 'yyyy年', { locale });
 
       case 'week': {
-        const start = startOfWeek(this.date, {
+        const start = startOfWeek(currentDate, {
           weekStartsOn: this.config.weekStartsOn,
         });
-        const end = endOfWeek(this.date, {
+        const end = endOfWeek(currentDate, {
           weekStartsOn: this.config.weekStartsOn,
         });
 
@@ -145,7 +158,7 @@ export class CalendarEngine {
 
       case 'day':
         // 3月20日 星期四
-        return format(this.date, 'M月d日 EEEE', { locale });
+        return format(currentDate, 'M月d日 EEEE', { locale });
 
       default:
         return '';

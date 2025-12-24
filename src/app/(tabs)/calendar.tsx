@@ -14,6 +14,8 @@ type Level = 'year' | 'month' | 'week' | 'day';
 export default function CalendarScreen() {
   const [engine] = useState(new CalendarEngine(new Date()));
   const [stack, setStack] = useState<Level[]>(['year', 'month']);
+  const [visibleDate, setVisibleDate] = useState<Date>(engine.getDate());
+
 
   const current = stack[stack.length - 1];
 
@@ -31,12 +33,25 @@ export default function CalendarScreen() {
     push('month'); // 进入 month 视图
   };
 
+  const handleMonthChange = (date: Date) => {
+    // 只更新锚点，不改变当前视图状态
+    engine.setAnchorDate(date);
+    console.log('Month changed to:', date);
+    setVisibleDate(date);
+  };
+
+
+
   const renderView = () => {
     switch (current) {
       case 'year':
         return <YearView engine={engine} onSelectMonth={onSelectMonth} />;
       case 'month':
-        return <MonthView engine={engine} onSelectDay={() => push('week')} />;
+        return <MonthView 
+          engine={engine} 
+          onSelectDay={() => push('week')} 
+          onMonthChange={handleMonthChange} 
+        />;
       case 'week':
         return <WeekView engine={engine} onSelectDay={() => push('day')} />;
       case 'day':
@@ -44,10 +59,15 @@ export default function CalendarScreen() {
     }
   };
 
-  return (
+   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top']}>
       <View style={styles.container}>
-        <CalendarHeader level={current} onBack={pop} engine={engine} />
+        <CalendarHeader 
+          level={current} 
+          onBack={pop} 
+          engine={engine} 
+          visibleDate={visibleDate}
+        />
         {renderView()}
       </View>
     </SafeAreaView>
@@ -60,6 +80,6 @@ const styles = StyleSheet.create({
     // backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f5fcff',
+    // backgroundColor: '#f5fcff',
   },
 });
