@@ -1,9 +1,11 @@
 import { View, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 export default function AgendaScreen() {
   return (
-    <View>
+    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
       <Text>AgendaScreen</Text>
-    </View>
+    </SafeAreaView>
   );
 }

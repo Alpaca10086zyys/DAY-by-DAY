@@ -38,11 +38,11 @@ export class CalendarEngine {
   }
 
   //设置锚点日期（更新用）
-  setAnchorDate(d: Date){
+  setAnchorDate(d: Date) {
     this.anchorDate = d;
   }
 
-  getAnchorDate(){
+  getAnchorDate() {
     return this.anchorDate;
   }
 

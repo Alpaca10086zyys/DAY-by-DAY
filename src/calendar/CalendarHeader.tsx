@@ -13,7 +13,7 @@ interface Props {
 
 export default function CalendarHeader({ level, onBack, engine, visibleDate }: Props) {
   const title = level === 'year' ? '' : engine.getTitle(level, visibleDate);
-  console.log('title', title, visibleDate);
+//   console.log('title', title, visibleDate);
 
   return (
     <View style={styles.header}>

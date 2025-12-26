@@ -2,8 +2,10 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Dimensions } from 'react-native';
 import { addMonths, format } from 'date-fns';
+import { zhCN, enUS, ja } from 'date-fns/locale';
 import { CalendarEngine } from '@/calendar/utils/calendarEngine';
 import { getConfig, WEEK_DAY_NAMES } from '@/calendar/utils/configManager';
+import { useTranslation } from 'react-i18next';
 
 interface MonthViewProps {
   engine: CalendarEngine;
@@ -12,10 +14,14 @@ interface MonthViewProps {
 }
 
 const CELL_HEIGHT = 56;
-const ROWS = 7;
+const ROWS = 6.5;
 const WEEK_HEADER_HEIGHT = 32;
+const MONTH_LABEL_HEIGHT = 28;
+const ANCHOR_Y = 120; // 紧贴星期标题下方
 
-const MONTH_HEIGHT = WEEK_HEADER_HEIGHT + CELL_HEIGHT * ROWS;
+const { t } = useTranslation();
+
+const MONTH_HEIGHT = WEEK_HEADER_HEIGHT + MONTH_LABEL_HEIGHT + CELL_HEIGHT * ROWS;
 
 function MonthPage({ date, engine }: { date: Date; engine: CalendarEngine }) {
   const today = new Date();
@@ -24,8 +30,18 @@ function MonthPage({ date, engine }: { date: Date; engine: CalendarEngine }) {
   const days = engine.getMonthGridByDate(date);
   const currentMonth = date.getMonth();
 
+  const firstDayIndex = days.findIndex((d) => d.getDate() === 1 && d.getMonth() === currentMonth);
+
+  const firstDayRow = Math.floor(firstDayIndex / 7);
+
   return (
     <View style={styles.monthPage}>
+      {/* 只在第一行之前显示月份 */}
+      {firstDayRow === 0 && (
+        <View style={styles.monthLabelContainer}>
+          <Text style={styles.monthLabel}>{format(date, 'M月')}</Text>
+        </View>
+      )}
       <View style={styles.grid}>
         {days.map((day) => {
           const isCurrentMonth = day.getMonth() === currentMonth;
@@ -62,7 +78,6 @@ function MonthPage({ date, engine }: { date: Date; engine: CalendarEngine }) {
 export default function MonthView({ engine, onSelectDay, onMonthChange }: MonthViewProps) {
   const flatListRef = useRef<FlatList>(null);
   const [currentMonth, setCurrentMonth] = useState<Date>(engine.getDate());
-  const [initialScrollDone, setInitialScrollDone] = useState(false); // 添加标志避免重复滚动
   const config = getConfig();
   const weekDays = WEEK_DAY_NAMES[config.language];
 
@@ -72,7 +87,7 @@ export default function MonthView({ engine, onSelectDay, onMonthChange }: MonthV
   ];
 
   /** 构造月份序列（以当前月为中心） */
-   const months = React.useMemo(() => {
+  const months = React.useMemo(() => {
     return Array.from({ length: 25 }, (_, i) => addMonths(engine.getDate(), i - 12));
   }, [engine.getDate()]);
 
@@ -83,7 +98,7 @@ export default function MonthView({ engine, onSelectDay, onMonthChange }: MonthV
     const initialIndex = months.findIndex(
       (month) =>
         month.getFullYear() === engine.getDate().getFullYear() &&
-        month.getMonth() === engine.getDate().getMonth()
+        month.getMonth() === engine.getDate().getMonth(),
     );
 
     if (initialIndex !== -1) {
@@ -97,25 +112,38 @@ export default function MonthView({ engine, onSelectDay, onMonthChange }: MonthV
   const scrollY = useRef(0);
 
   const onScroll = (e: any) => {
-    scrollY.current = e.nativeEvent.contentOffset.y;
+    const y = e.nativeEvent.contentOffset.y;
 
-    const index = Math.floor(scrollY.current / MONTH_HEIGHT);
-    const month = months[index];
+    const anchorAbsoluteY = y + ANCHOR_Y;
+
+    const monthIndex = Math.floor(anchorAbsoluteY / MONTH_HEIGHT);
+    const month = months[monthIndex];
 
     if (month) {
-      onMonthChange?.(month);
       setCurrentMonth(month);
+      onMonthChange?.(month);
     }
   };
 
-
   return (
     <View style={{ flex: 1 }}>
+      {/* 定位线 */}
+      <View
+        pointerEvents="none"
+        style={{
+          position: 'absolute',
+          top: ANCHOR_Y,
+          left: 0,
+          right: 0,
+          height: 1,
+          backgroundColor: 'red',
+          zIndex: 999,
+        }}
+      />
+
       {/* 星期标题 */}
       <View style={styles.stickyMonth}>
-        <Text style={styles.stickyText}>
-        {format(currentMonth, 'M月')}
-      </Text>
+        <Text style={styles.stickyText}>{format(currentMonth, 'M月')}</Text>
       </View>
       <View style={styles.weekHeader}>
         {orderedWeekDays.map((day, i) => (
@@ -124,7 +152,7 @@ export default function MonthView({ engine, onSelectDay, onMonthChange }: MonthV
           </Text>
         ))}
       </View>
-        
+
       <FlatList
         ref={flatListRef}
         data={months}
@@ -145,7 +173,6 @@ export default function MonthView({ engine, onSelectDay, onMonthChange }: MonthV
         removeClippedSubviews={true}
         updateCellsBatchingPeriod={50}
       />
-      
     </View>
   );
 }
@@ -180,7 +207,16 @@ const styles = StyleSheet.create({
   monthPage: {
     height: MONTH_HEIGHT,
   },
-
+  monthLabelContainer: {
+    height: 28,
+    justifyContent: 'flex-end',
+    paddingLeft: 12,
+  },
+  monthLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#666',
+  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -197,14 +233,14 @@ const styles = StyleSheet.create({
   },
 
   dayNumber: {
-    fontSize: 15,
-    fontWeight: '500',
+    fontSize: 16,
+    fontWeight: 'bold',
     color: '#111',
     textAlign: 'center',
   },
 
   eventPlaceholder: {
-    flex: 1,              // 占据剩余空间
+    flex: 1, // 占据剩余空间
     marginTop: 4,
   },
 
