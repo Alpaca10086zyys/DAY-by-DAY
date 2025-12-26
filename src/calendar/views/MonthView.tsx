@@ -2,10 +2,13 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Dimensions } from 'react-native';
 import { addMonths, format } from 'date-fns';
-import { zhCN, enUS, ja } from 'date-fns/locale';
 import { CalendarEngine } from '@/calendar/utils/calendarEngine';
-import { getConfig, WEEK_DAY_NAMES } from '@/calendar/utils/configManager';
+import { useAppConfig } from '@/config/useAppConfig';
+import { THEMES } from '@/config/appConfig';
+import { WEEK_DAY_NAMES } from '@/i18n/weekDays';
 import { useTranslation } from 'react-i18next';
+import { MONTH_NAMES } from '@/i18n/months';
+
 
 interface MonthViewProps {
   engine: CalendarEngine;
@@ -19,13 +22,12 @@ const WEEK_HEADER_HEIGHT = 32;
 const MONTH_LABEL_HEIGHT = 28;
 const ANCHOR_Y = 120; // 紧贴星期标题下方
 
-const { t } = useTranslation();
-
 const MONTH_HEIGHT = WEEK_HEADER_HEIGHT + MONTH_LABEL_HEIGHT + CELL_HEIGHT * ROWS;
 
 function MonthPage({ date, engine }: { date: Date; engine: CalendarEngine }) {
   const today = new Date();
-  const config = getConfig();
+  const { config } = useAppConfig();
+  const themeColor = THEMES[config.themeColor];
 
   const days = engine.getMonthGridByDate(date);
   const currentMonth = date.getMonth();
@@ -39,7 +41,7 @@ function MonthPage({ date, engine }: { date: Date; engine: CalendarEngine }) {
       {/* 只在第一行之前显示月份 */}
       {firstDayRow === 0 && (
         <View style={styles.monthLabelContainer}>
-          <Text style={styles.monthLabel}>{format(date, 'M月')}</Text>
+          <Text style={[styles.monthLabel, { left: `${14.28 * firstDayIndex}%` }]}>{MONTH_NAMES[config.language][date.getMonth()]}</Text>
         </View>
       )}
       <View style={styles.grid}>
@@ -60,7 +62,7 @@ function MonthPage({ date, engine }: { date: Date; engine: CalendarEngine }) {
                 style={[
                   styles.dayNumber,
                   !isCurrentMonth && styles.notCurrentMonthText,
-                  isToday && { color: config.themeColor, fontWeight: '600' },
+                  isToday && { color: themeColor, fontWeight: '600' },
                 ]}
               >
                 {day.getDate()}
@@ -78,12 +80,15 @@ function MonthPage({ date, engine }: { date: Date; engine: CalendarEngine }) {
 export default function MonthView({ engine, onSelectDay, onMonthChange }: MonthViewProps) {
   const flatListRef = useRef<FlatList>(null);
   const [currentMonth, setCurrentMonth] = useState<Date>(engine.getDate());
-  const config = getConfig();
-  const weekDays = WEEK_DAY_NAMES[config.language];
+  const { config } = useAppConfig();
+  const { t } = useTranslation();
 
+  const themeColor = THEMES[config.themeColor];
+
+  const weekDays = WEEK_DAY_NAMES[config.language];
   const orderedWeekDays = [
-    ...weekDays.slice(engine.config.weekStartsOn),
-    ...weekDays.slice(0, engine.config.weekStartsOn),
+    ...weekDays.slice(config.weekStartsOn),
+    ...weekDays.slice(0, config.weekStartsOn),
   ];
 
   /** 构造月份序列（以当前月为中心） */
@@ -143,11 +148,11 @@ export default function MonthView({ engine, onSelectDay, onMonthChange }: MonthV
 
       {/* 星期标题 */}
       <View style={styles.stickyMonth}>
-        <Text style={styles.stickyText}>{format(currentMonth, 'M月')}</Text>
+        <Text style={styles.stickyText}>{MONTH_NAMES[config.language][currentMonth.getMonth()]}</Text>
       </View>
       <View style={styles.weekHeader}>
         {orderedWeekDays.map((day, i) => (
-          <Text key={i} style={[styles.weekText, { color: 'config.themeColor' }]}>
+          <Text key={i} style={[styles.weekText, { color: themeColor }]}>
             {day}
           </Text>
         ))}

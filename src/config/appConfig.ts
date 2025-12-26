@@ -4,7 +4,7 @@ import { Language } from '@/i18n/types';
 export interface AppConfig {
   language: Language;
   weekStartsOn: 0 | 1;
-  themeColor: ThemeKey;
+  theme: ThemeKey;
 }
 
 export const THEMES = {
@@ -20,7 +20,7 @@ export type ThemeKey = keyof typeof THEMES;
 export const DEFAULT_CONFIG: AppConfig = {
   language: 'zh',
   weekStartsOn: 0,
-  themeColor: 'blue',
+  theme: 'blue',
 };
 
 export const CONFIG_STORAGE_KEY = 'APP_CONFIG';

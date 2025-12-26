@@ -1,13 +1,9 @@
 // src/theme/useTheme.ts
 import { useAppConfig } from '@/config/useAppConfig';
-import { THEMES } from '@/config/appConfig';
+import { THEMES, Theme } from '@/theme/themes';
 
-export function useTheme() {
+export function useTheme(): Theme {
   const { config } = useAppConfig();
 
-  const themeColor = THEMES[config.themeColor];
-
-  return {
-    themeColor,
-  };
+  return THEMES[config.theme];
 }
