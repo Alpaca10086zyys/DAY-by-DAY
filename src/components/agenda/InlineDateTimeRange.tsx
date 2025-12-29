@@ -1,6 +1,6 @@
 // InlineDateTimeRange.tsx
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { DateTimeRow } from './DateTimeRow';
 import { useTranslation } from 'react-i18next';
 
@@ -23,7 +23,7 @@ export const InlineDateTimeRange: React.FC<Props> = ({
   const { t } = useTranslation();
 
   return (
-    <View>
+    <View style={styles.container}>
       <DateTimeRow
         label={t('agenda.start')}
         type="start"
@@ -32,7 +32,7 @@ export const InlineDateTimeRange: React.FC<Props> = ({
         setActive={setActive}
         onChange={(d) => onChange(d, end)}
       />
-
+      <View style={{ height: 1, backgroundColor: '#F2F2F7' }} />
       <DateTimeRow
         label={t('agenda.end')}
         type="end"
@@ -44,3 +44,14 @@ export const InlineDateTimeRange: React.FC<Props> = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: { 
+    gap: 3, 
+    borderColor: '#F2F2F7', 
+    borderWidth: 1, 
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  }
+});

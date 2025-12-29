@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, Platform, TextInput } from 'react-native';
+import { View, Text, Button, StyleSheet, Pressable, Platform, TextInput } from 'react-native';
 import Modal from 'react-native-modal';
 import { useCreateEvent } from '@/agenda/hooks/useCreateEventModal';
 import { AgendaEvent, ThemeKey } from '@/agenda/types';
 import { createEvent } from '@/agenda/models/event';
 import { ColorSelector } from '@/components/base/ColorSelector';
 import { InlineDateTimeRange } from './InlineDateTimeRange';
+import { Collapse } from '@/animate/Collapse';
 
 const COLORS: ThemeKey[] = ['blue', 'green', 'orange'];
 
@@ -22,6 +23,7 @@ export const EventModal: React.FC<EventModalProps> = ({ onSave }) => {
   const [start, setStart] = useState(new Date());
   const [end, setEnd] = useState(new Date(Date.now() + 60 * 60 * 1000));
   const [color, setColor] = useState<ThemeKey>('blue');
+  const [colorPickerExpand, setColorPickerExpand] = useState(false);
 
   useEffect(() => {
     if (editingEvent) {
@@ -53,6 +55,10 @@ export const EventModal: React.FC<EventModalProps> = ({ onSave }) => {
 
     onSave(event);
     closeModal();
+  };
+
+  const toggleColor = () => {
+    setColorPickerExpand(!colorPickerExpand);
   };
 
   return (
@@ -89,9 +95,15 @@ export const EventModal: React.FC<EventModalProps> = ({ onSave }) => {
           />
         </View>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>颜色</Text>
-           <ColorSelector
+          <Pressable onPress={toggleColor} style={styles.iosInput}>
+            <Text>t('agenda.color')</Text>
+            <Collapse isOpen={colorPickerExpand} maxHeight={40}>
+            <ColorSelector
               value={color} options={COLORS} onChange={(theme: ThemeKey) => setColor(theme)} />
+          </Collapse>
+          </Pressable>
+          
+           
         </View>
 
         <View style={styles.section}>
@@ -105,6 +117,15 @@ export const EventModal: React.FC<EventModalProps> = ({ onSave }) => {
             }}
           />
         </View>
+
+        {/* <View style={styles.section}>
+          <Pressable onPress={toggle} style={{backgroundColor: 'red'}}>
+            <Text>test Expand</Text>
+          </Pressable>
+          <Collapse isOpen={expand} maxHeight={180}>
+            <Text style={{height: 180, backgroundColor: 'red', width: 180}}>保存</Text>
+          </Collapse>
+        </View> */}
         <Button title="保存" onPress={handleSave} />
         <Button title="取消" onPress={closeModal} color="#aaa" />
       </View>

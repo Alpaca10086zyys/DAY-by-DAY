@@ -1,9 +1,10 @@
 // src/agenda/components/DateTimeRow.tsx
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, LayoutAnimation, Platform, UIManager } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import { mergeDateTime } from './utils';
+import { Collapse } from '@/animate/Collapse';
 
 interface Props {
   label: string;
@@ -27,7 +28,12 @@ export const DateTimeRow: React.FC<Props> = ({
   const isTimeActive =
     active?.type === type && active?.mode === 'time';
 
+  if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+
   const toggle = (mode: 'date' | 'time') => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (active?.type === type && active?.mode === mode) {
       setActive(null); // 再点收起
     } else {
@@ -73,7 +79,7 @@ export const DateTimeRow: React.FC<Props> = ({
       </View>
 
       {/* 👇 展开区就在这一行下面 */}
-      {isDateActive && (
+      <Collapse isOpen={isDateActive} maxHeight={340}>
         <View style={styles.collapse}>
           <DateTimePicker
             value={value}
@@ -82,9 +88,10 @@ export const DateTimeRow: React.FC<Props> = ({
             onChange={(_, d) => d && onChange(mergeDateTime(value, d, 'date'))}
           />
         </View>
-      )}
+      </Collapse>
 
-      {isTimeActive && (
+
+      <Collapse isOpen={isTimeActive} maxHeight={220}>
         <View style={styles.collapse}>
           <DateTimePicker
             value={value}
@@ -94,18 +101,17 @@ export const DateTimeRow: React.FC<Props> = ({
             onChange={(_, d) => d && onChange(mergeDateTime(value, d, 'time'))}
           />
         </View>
-      )}
+      </Collapse>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   row: {
-    marginBottom: 6,
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'pink',
+    // backgroundColor: 'pink',
     height: 40,
     justifyContent: 'space-between',
   },
@@ -131,6 +137,6 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   collapse: {
-    marginTop: 8,
+    marginTop: 0,
   },
 });
