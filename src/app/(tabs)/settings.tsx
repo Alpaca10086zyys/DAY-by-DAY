@@ -2,19 +2,11 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useConfigAndI18n } from '@/config/ConfigAndI18nProvider';
-import { THEMES, ThemeKey } from '@/config/appConfig';
+import { THEMES } from '@/theme/themes';
 import { useAppConfig } from '@/config/useAppConfig';
 import { CapsuleSegmented } from '@/components/base/CapsuleSegmented';
 import { ColorSelector } from '@/components/base/ColorSelector';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-const THEME_COLORS = [
-  '#007AFF', // iOS 蓝
-  '#34C759', // 绿
-  '#FF9500', // 橙
-  '#FF3B30', // 红
-  '#AF52DE', // 紫
-];
 
 export default function Settings() {
   const { t } = useTranslation();
@@ -44,9 +36,9 @@ export default function Settings() {
             {t('settings.theme')}
           </Text>
           <ColorSelector
-            value={config.themeColor}
-            options={Object.keys(THEMES) as ThemeKey[]}
-            onChange={(theme) => updateConfig({ themeColor: theme })}
+            value={config.theme}
+            options={Object.keys(THEMES) as (keyof typeof THEMES)[]}
+            onChange={(theme) => updateConfig({ theme: theme })}
           />
         </View>
       </View>

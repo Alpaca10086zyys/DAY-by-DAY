@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { ThemeKey, THEMES } from '@/config/appConfig';
+import { THEMES, ThemeKey } from '@/theme/themes';
 
 interface Props {
   value: ThemeKey;
@@ -20,7 +20,7 @@ export function ColorSelector({ value, options, onChange }: Props) {
             onPress={() => onChange(themeKey)}
             style={[
               styles.color,
-              { backgroundColor: color },
+              { backgroundColor: color.primary },
               active && styles.active,
             ]}
           />

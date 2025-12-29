@@ -3,6 +3,7 @@ import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { CalendarEngine } from './utils/calendarEngine';
 import { Ionicons } from '@expo/vector-icons';
+import { useCreateEvent } from '@/agenda/hooks/useCreateEventModal';
 
 interface Props {
   level: 'year' | 'month' | 'week' | 'day';
@@ -14,7 +15,12 @@ interface Props {
 export default function CalendarHeader({ level, onBack, engine, visibleDate }: Props) {
   const title = level === 'year' ? '' : engine.getTitle(level, visibleDate);
 //   console.log('title', title, visibleDate);
+  const { open } = useCreateEvent();
 
+  const handleAddEvent = () => {
+    open(visibleDate);
+    console.log('handleAddEvent', visibleDate);
+  };
   return (
     <View style={styles.header}>
       {level !== 'year' ? (
@@ -25,7 +31,7 @@ export default function CalendarHeader({ level, onBack, engine, visibleDate }: P
       ) : (
         <View style={{ width: 1 }}></View>
       )}
-      <Pressable onPress={() => {}} style={[styles.rightPlaceholder, styles.button]}>
+      <Pressable onPress={handleAddEvent} style={[styles.rightPlaceholder, styles.button]}>
         <Ionicons name="add" size={24} color="#007AFF" style={styles.icon} />
       </Pressable>
     </View>

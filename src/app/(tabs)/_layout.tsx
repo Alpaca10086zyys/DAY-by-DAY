@@ -1,3 +1,4 @@
+// src/app/(tabs)/_layout.tsx
 import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';
 import { StyleSheet } from 'react-native';
 

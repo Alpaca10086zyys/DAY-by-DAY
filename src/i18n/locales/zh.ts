@@ -30,4 +30,16 @@ export default {
     english: 'English',
     theme: '主题',
   },
+
+  agenda: {
+    title: '日程',
+    agendaTitle: '标题',
+    inputAgendaTitle: '在此输入日程标题',
+    description: '备注',
+    inputAgendaDescription: '在此输入日程备注',
+    color: '颜色',
+    timeRange: '时间范围',
+    start: '开始时间',
+    end: '结束时间',
+  },
 };
