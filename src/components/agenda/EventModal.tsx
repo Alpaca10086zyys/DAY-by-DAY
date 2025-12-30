@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, Pressable, Platform, TextInput } from 'react-native';
 import Modal from 'react-native-modal';
 import { useCreateEvent } from '@/agenda/hooks/useCreateEventModal';
-import { AgendaEvent, ThemeKey } from '@/agenda/types';
+import { AgendaEvent } from '@/agenda/types';
+import { ThemeKey } from '@/theme/themes';
 import { createEvent } from '@/agenda/models/event';
-import { ColorSelector } from '@/components/base/ColorSelector';
 import { InlineDateTimeRange } from './InlineDateTimeRange';
 import { Collapse } from '@/animate/Collapse';
+import { CollapseColorPicker } from '@/components/base/CollapseColorPicker';
 
 const COLORS: ThemeKey[] = ['blue', 'green', 'orange'];
 
@@ -95,15 +96,11 @@ export const EventModal: React.FC<EventModalProps> = ({ onSave }) => {
           />
         </View>
         <View style={styles.section}>
-          <Pressable onPress={toggleColor} style={styles.iosInput}>
-            <Text>t('agenda.color')</Text>
-            <Collapse isOpen={colorPickerExpand} maxHeight={40}>
-            <ColorSelector
-              value={color} options={COLORS} onChange={(theme: ThemeKey) => setColor(theme)} />
-          </Collapse>
-          </Pressable>
-          
-           
+          <CollapseColorPicker
+            value={color}
+            options={COLORS}
+            onChange={(theme: ThemeKey) => setColor(theme)}
+          />
         </View>
 
         <View style={styles.section}>
@@ -117,15 +114,6 @@ export const EventModal: React.FC<EventModalProps> = ({ onSave }) => {
             }}
           />
         </View>
-
-        {/* <View style={styles.section}>
-          <Pressable onPress={toggle} style={{backgroundColor: 'red'}}>
-            <Text>test Expand</Text>
-          </Pressable>
-          <Collapse isOpen={expand} maxHeight={180}>
-            <Text style={{height: 180, backgroundColor: 'red', width: 180}}>保存</Text>
-          </Collapse>
-        </View> */}
         <Button title="保存" onPress={handleSave} />
         <Button title="取消" onPress={closeModal} color="#aaa" />
       </View>

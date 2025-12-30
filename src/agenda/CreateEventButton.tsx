@@ -25,9 +25,6 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'absolute', // 可在页面任意位置使用
-    bottom: 30,
-    right: 30,
     zIndex: 1000,
   },
   text: {

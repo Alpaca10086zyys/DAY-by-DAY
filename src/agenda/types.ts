@@ -1,6 +1,6 @@
 //src/agenda/types.ts
 export type EventID = string;
-export type ThemeKey = 'blue' | 'green' | 'orange';
+import type { ThemeKey } from '@/theme/themes';
 
 export interface AgendaEvent {
   id: EventID;

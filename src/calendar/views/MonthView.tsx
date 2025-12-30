@@ -5,6 +5,7 @@ import { addMonths, format } from 'date-fns';
 import { CalendarEngine } from '@/calendar/utils/calendarEngine';
 import { useAppConfig } from '@/config/useAppConfig';
 import { THEMES } from '@/theme/themes';
+import { useTheme } from '@/theme/useTheme';
 import { WEEK_DAY_NAMES } from '@/i18n/weekDays';
 import { useTranslation } from 'react-i18next';
 import { MONTH_NAMES } from '@/i18n/months';
@@ -26,8 +27,8 @@ const MONTH_HEIGHT = WEEK_HEADER_HEIGHT + MONTH_LABEL_HEIGHT + CELL_HEIGHT * ROW
 
 function MonthPage({ date, engine }: { date: Date; engine: CalendarEngine }) {
   const today = new Date();
+  const theme = useTheme();
   const { config } = useAppConfig();
-  const themeColor = THEMES[config.theme];
 
   const days = engine.getMonthGridByDate(date);
   const currentMonth = date.getMonth();
@@ -55,14 +56,14 @@ function MonthPage({ date, engine }: { date: Date; engine: CalendarEngine }) {
               style={[
                 styles.cell,
                 !isCurrentMonth && styles.notCurrentMonth,
-                isToday && { ...styles.todayCell, backgroundColor: themeColor.primarySoft },
+                isToday && { ...styles.todayCell, backgroundColor: theme.primarySoft },
               ]}
             >
               <Text
                 style={[
                   styles.dayNumber,
                   !isCurrentMonth && styles.notCurrentMonthText,
-                  isToday && { color: themeColor.primary, fontWeight: '600' },
+                  isToday && { color: theme.primary, fontWeight: '600' },
                 ]}
               >
                 {day.getDate()}
@@ -83,7 +84,7 @@ export default function MonthView({ engine, onSelectDay, onMonthChange }: MonthV
   const { config } = useAppConfig();
   const { t } = useTranslation();
 
-  const themeColor = THEMES[config.theme];
+  const theme = useTheme();
 
   const weekDays = WEEK_DAY_NAMES[config.language];
   const orderedWeekDays = [
@@ -152,7 +153,7 @@ export default function MonthView({ engine, onSelectDay, onMonthChange }: MonthV
       </View>
       <View style={styles.weekHeader}>
         {orderedWeekDays.map((day, i) => (
-          <Text key={i} style={[styles.weekText, { color: themeColor.primary }]}>
+          <Text key={i} style={[styles.weekText, { color: theme.primary }]}>
             {day}
           </Text>
         ))}

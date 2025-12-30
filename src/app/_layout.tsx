@@ -6,15 +6,23 @@ import { Slot } from 'expo-router';
 import { EventModal } from '@/components/agenda/EventModal';
 import { CreateEventProvider } from '@/agenda/hooks/useCreateEventModal';
 import '@/i18n';
+import 'react-native-get-random-values'; 
+import { useAgenda } from '@/agenda/hooks/useAgenda';
+
 
 export default function RootLayout() {
+  const { upsertEvent } = useAgenda();
   return (
     <SafeAreaProvider>
       <AppConfigProvider>
         <ConfigAndI18nProvider>
           <CreateEventProvider>
             <Slot />
-            <EventModal onSave={() => {}} />
+            <EventModal
+              onSave={(event) => {
+                upsertEvent(event);
+              }}
+            />
           </CreateEventProvider>
         </ConfigAndI18nProvider>
       </AppConfigProvider>

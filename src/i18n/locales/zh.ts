@@ -42,4 +42,12 @@ export default {
     start: '开始时间',
     end: '结束时间',
   },
+
+  color: {
+    red: '红色',
+    blue: '蓝色',
+    green: '绿色',
+    orange: '橙色',
+    purple: '紫色',
+  },
 };

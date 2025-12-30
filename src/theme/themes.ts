@@ -1,3 +1,4 @@
+//src/theme/themes.ts
 export const THEMES = {
   blue: {
     primary: '#007AFF',

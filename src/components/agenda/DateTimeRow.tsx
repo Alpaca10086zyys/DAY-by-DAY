@@ -5,6 +5,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import { mergeDateTime } from './utils';
 import { Collapse } from '@/animate/Collapse';
+import { useTheme } from '@/theme/useTheme';
 
 interface Props {
   label: string;
@@ -27,6 +28,8 @@ export const DateTimeRow: React.FC<Props> = ({
     active?.type === type && active?.mode === 'date';
   const isTimeActive =
     active?.type === type && active?.mode === 'time';
+
+  const theme = useTheme();
 
   if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
     UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -51,12 +54,11 @@ export const DateTimeRow: React.FC<Props> = ({
           <Pressable
             style={[
               styles.capsule,
-              isDateActive && styles.activeCapsule,
             ]}
             onPress={() => toggle('date')}
           >
             <Text
-              style={isDateActive && styles.activeText}
+              style={isDateActive && { color: theme.primary }}
             >
               {format(value, 'yyyy年MM月dd日')}
             </Text>
@@ -65,12 +67,11 @@ export const DateTimeRow: React.FC<Props> = ({
           <Pressable
             style={[
               styles.capsule,
-              isTimeActive && styles.activeCapsule,
             ]}
             onPress={() => toggle('time')}
           >
             <Text
-              style={isTimeActive && styles.activeText}
+              style={isTimeActive && { color: theme.primary }}
             >
               {format(value, 'HH:mm')}
             </Text>
@@ -129,9 +130,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 999,
     backgroundColor: '#f2f2f7',
-  },
-  activeCapsule: {
-    backgroundColor: '#007aff',
   },
   activeText: {
     color: 'white',
