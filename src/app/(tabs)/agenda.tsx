@@ -6,7 +6,7 @@ import { CreateEventButton } from '@/agenda/CreateEventButton';
 import { useAgenda } from '@/agenda/hooks/useAgenda';
 import { formatTimeRange, getSoftColor } from '@/agenda/utils/agendaUI';
 import { AgendaEvent } from '@/agenda/types';
-
+import { AgendaDaySection } from '@/components/agenda/AgendaDaySection';
 
 function groupByDay(events) {
   const map: Record<string, AgendaEvent[]> = {};
@@ -24,7 +24,7 @@ function groupByDay(events) {
 }
 
 export default function AgendaScreen() {
-  const { sortedEvents, reloadEvents } = useAgenda();
+  const { sortedEvents, reloadEvents, removeEvent } = useAgenda();
   const [refreshing, setRefreshing] = useState(false);
 
   const oneMonthAgo = new Date();
@@ -34,7 +34,27 @@ export default function AgendaScreen() {
     e => e.startAt >= oneMonthAgo.getTime()
   );
 
-  const sections = useMemo(() => groupByDay(recentEvents), [recentEvents]);
+  const handleDelete = (id: string) => {
+    removeEvent(id);
+  };
+
+  const handleEdit = (event: AgendaEvent) => {
+    // 打开你已有的 Create / Edit Event Modal
+    // openEditModal(event);
+  };
+
+  const sections = useMemo(() => {
+    const map: Record<string, any[]> = {};
+    sortedEvents.forEach(e => {
+      const key = new Date(e.startAt).toISOString().slice(0, 10);
+      if (!map[key]) map[key] = [];
+      map[key].push(e);
+    });
+    return Object.entries(map).map(([date, events]) => ({
+      date,
+      events,
+    }));
+  }, [sortedEvents]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -43,9 +63,9 @@ export default function AgendaScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
-      <View style={styles.header}>
-        <Text style={styles.title}>日程</Text>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 16 }}>
+        <Text style={{ fontSize: 24, fontWeight: '700' }}>日程</Text>
         <CreateEventButton />
       </View>
 
@@ -56,42 +76,7 @@ export default function AgendaScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         renderItem={({ item }) => (
-          <View>
-            {/* 日期标题 */}
-            <Text style={styles.dateTitle}>
-              {format(new Date(item.date), 'MM月dd日')}
-            </Text>
-
-            {item.data.map(event => (
-              <View key={event.id} style={styles.row}>
-                {/* 时间线 */}
-                <View style={styles.timeline}>
-                  <View style={styles.dot} />
-                  <View style={styles.line} />
-                </View>
-
-                {/* 事件卡片 */}
-                <View
-                  style={[
-                    styles.card,
-                    { backgroundColor: getSoftColor(event.color) },
-                  ]}
-                >
-                  <View style={styles.text}>
-                     <Text style={styles.titleText}>{event.title}</Text>
-                      {!!event.description && (
-                        <Text style={styles.desc}>{event.description}</Text>
-                      )}
-                  </View>
-                  <View>
-                    <Text style={styles.time}>
-                      {formatTimeRange(event.startAt, event.endAt)}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            ))}
-          </View>
+          <AgendaDaySection date={item.date} events={item.events} onDelete={handleDelete} onEdit={handleEdit} />
         )}
       />
     </SafeAreaView>

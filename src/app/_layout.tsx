@@ -8,24 +8,28 @@ import { CreateEventProvider } from '@/agenda/hooks/useCreateEventModal';
 import '@/i18n';
 import 'react-native-get-random-values'; 
 import { useAgenda } from '@/agenda/hooks/useAgenda';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
 
 
 export default function RootLayout() {
   const { upsertEvent } = useAgenda();
   return (
-    <SafeAreaProvider>
-      <AppConfigProvider>
-        <ConfigAndI18nProvider>
-          <CreateEventProvider>
-            <Slot />
-            <EventModal
-              onSave={(event) => {
-                upsertEvent(event);
-              }}
-            />
-          </CreateEventProvider>
-        </ConfigAndI18nProvider>
-      </AppConfigProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <AppConfigProvider>
+          <ConfigAndI18nProvider>
+            <CreateEventProvider>
+              <Slot />
+              <EventModal
+                onSave={(event) => {
+                  upsertEvent(event);
+                }}
+              />
+            </CreateEventProvider>
+          </ConfigAndI18nProvider>
+        </AppConfigProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
