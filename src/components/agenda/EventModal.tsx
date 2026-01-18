@@ -45,6 +45,7 @@ export const EventModal: React.FC<EventModalProps> = ({ onSave }) => {
           startAt: start.getTime(),
           endAt: end.getTime(),
           updatedAt: Date.now(),
+          color,
         }
       : createEvent({
           title,

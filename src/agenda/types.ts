@@ -13,4 +13,8 @@ export interface AgendaEvent {
   color: ThemeKey;
   createdAt: number;
   updatedAt?: number;
+
+  // 🔔 Notification 扩展
+  remindAt?: number;        // 实际触发提醒时间（ms）
+  notificationId?: string; // expo-notifications 返回的ID
 }

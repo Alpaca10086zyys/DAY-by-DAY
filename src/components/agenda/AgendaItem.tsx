@@ -13,6 +13,7 @@ type Props = {
 };
 
 export function AgendaItem({ event, onDelete, onEdit }: Props) {
+  
   const handleDeletePress = () => {
     Alert.alert(
       '删除日程',
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',   // 👈 垂直居中
     alignItems: 'center',
-    paddingHorizontal: 22,
+    paddingHorizontal: 44,
   },
 
   action: {

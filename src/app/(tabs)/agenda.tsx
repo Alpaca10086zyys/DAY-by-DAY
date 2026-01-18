@@ -1,12 +1,14 @@
 import { View, Text, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { format } from 'date-fns';
 import { CreateEventButton } from '@/agenda/CreateEventButton';
 import { useAgenda } from '@/agenda/hooks/useAgenda';
 import { formatTimeRange, getSoftColor } from '@/agenda/utils/agendaUI';
 import { AgendaEvent } from '@/agenda/types';
 import { AgendaDaySection } from '@/components/agenda/AgendaDaySection';
+import { useCreateEvent } from '@/agenda/hooks/useCreateEventModal';
+
 
 function groupByDay(events) {
   const map: Record<string, AgendaEvent[]> = {};
@@ -38,10 +40,12 @@ export default function AgendaScreen() {
     removeEvent(id);
   };
 
+  const { open } = useCreateEvent();
+
   const handleEdit = (event: AgendaEvent) => {
-    // 打开你已有的 Create / Edit Event Modal
-    // openEditModal(event);
+    open(event); // 👈 把当前日程传给编辑弹窗
   };
+
 
   const sections = useMemo(() => {
     const map: Record<string, any[]> = {};
@@ -62,6 +66,10 @@ export default function AgendaScreen() {
     setTimeout(() => { reloadEvents(); setRefreshing(false); }, 500);
   };
 
+  const handleSaved = async () => {
+    await onRefresh();
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 16 }}>
@@ -71,12 +79,18 @@ export default function AgendaScreen() {
 
       <FlatList
         data={sections}
+        extraData={sections}
         keyExtractor={item => item.date}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         renderItem={({ item }) => (
-          <AgendaDaySection date={item.date} events={item.events} onDelete={handleDelete} onEdit={handleEdit} />
+          <AgendaDaySection 
+            date={item.date} 
+            events={item.events} 
+            onDelete={handleDelete} 
+            onEdit={handleEdit} 
+          />
         )}
       />
     </SafeAreaView>

@@ -3,6 +3,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { AgendaEvent } from '../types';
 import { loadEvents, saveEvents } from '../storage/eventStore';
 import { format, eachDayOfInterval } from 'date-fns';
+import { scheduleEventNotification, cancelEventNotification } from '@/services/notification';
 
 export function useAgenda() {
   const [events, setEvents] = useState<AgendaEvent[]>([]);
@@ -23,19 +24,37 @@ export function useAgenda() {
 
   const upsertEvent = async (event: AgendaEvent) => {
     setEvents(prev => {
-      const exists = prev.some(e => e.id === event.id);
+      const exists = prev.find(e => e.id === event.id);
+
+      // 如果之前有通知，先取消
+      if (exists?.notificationId) {
+        cancelEventNotification(exists.notificationId);
+      }
+
+      // 重新创建
+      let nextEvent = { ...event };
+      if (event.remindAt) {
+        scheduleEventNotification(event).then(id => {
+          nextEvent.notificationId = id ?? undefined;
+          saveEvents([...prev.filter(e => e.id !== event.id), nextEvent]);
+        });
+      }
+
       const next = exists
-        ? prev.map(e => (e.id === event.id ? event : e))
-        : [...prev, event];
+        ? prev.map(e => (e.id === event.id ? nextEvent : e))
+        : [...prev, nextEvent];
 
       saveEvents(next);
-      console.log('插入Event', event, exists);
       return next;
     });
   };
 
   const removeEvent = async (id: string) => {
     setEvents(prev => {
+      const target = prev.find(e => e.id === id);
+      if (target?.notificationId) {
+        cancelEventNotification(target.notificationId);
+      }
       const next = prev.filter(e => e.id !== id);
       saveEvents(next);
       return next;
