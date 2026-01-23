@@ -19,10 +19,12 @@ export const CreateEventButton = () => {
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#4A90E2',
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#007AFF',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,

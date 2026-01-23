@@ -17,7 +17,7 @@ interface EventModalProps {
 
 
 export const EventModal: React.FC<EventModalProps> = ({ onSave }) => {
-  const { isOpen, closeModal, editingEvent } = useCreateEvent();
+  const { isOpen, closeModal, editingEvent, initialDate } = useCreateEvent();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -26,34 +26,46 @@ export const EventModal: React.FC<EventModalProps> = ({ onSave }) => {
   const [color, setColor] = useState<ThemeKey>('blue');
   const [colorPickerExpand, setColorPickerExpand] = useState(false);
 
+  // 当 modal 打开时，根据 editingEvent 或 initialDate 重置表单
   useEffect(() => {
-    if (editingEvent) {
-      setTitle(editingEvent.title);
-      setDescription(editingEvent.description ?? '');
-      setStart(new Date(editingEvent.startAt));
-      setEnd(new Date(editingEvent.endAt));
-      setColor(editingEvent.color);
+    if (isOpen) {
+      if (editingEvent) {
+        // 编辑模式：填充现有数据
+        setTitle(editingEvent.title);
+        setDescription(editingEvent.description ?? '');
+        setStart(new Date(editingEvent.startAt));
+        setEnd(new Date(editingEvent.endAt));
+        setColor(editingEvent.color);
+      } else {
+        // 新建模式：使用 initialDate 或当前时间，重置所有字段
+        setTitle('');
+        setDescription('');
+        const baseDate = initialDate || new Date();
+        setStart(baseDate);
+        setEnd(new Date(baseDate.getTime() + 60 * 60 * 1000)); // 1小时后
+        setColor('blue');
+      }
     }
-  }, [editingEvent, isOpen]);
+  }, [editingEvent, initialDate, isOpen]);
 
   const handleSave = () => {
     const event: AgendaEvent = editingEvent
       ? {
-          ...editingEvent,
-          title,
-          description,
-          startAt: start.getTime(),
-          endAt: end.getTime(),
-          updatedAt: Date.now(),
-          color,
-        }
+        ...editingEvent,
+        title,
+        description,
+        startAt: start.getTime(),
+        endAt: end.getTime(),
+        updatedAt: Date.now(),
+        color,
+      }
       : createEvent({
-          title,
-          description,
-          startAt: start.getTime(),
-          endAt: end.getTime(),
-          color,
-        });
+        title,
+        description,
+        startAt: start.getTime(),
+        endAt: end.getTime(),
+        color,
+      });
 
     onSave(event);
     closeModal();
@@ -72,7 +84,7 @@ export const EventModal: React.FC<EventModalProps> = ({ onSave }) => {
       onSwipeComplete={closeModal}
       animationIn="slideInUp"            // 上滑弹出
       animationOut="slideOutDown"        // 下滑消失
-    //   backdropTransitionOutTiming={0}    // 避免闪烁
+      //   backdropTransitionOutTiming={0}    // 避免闪烁
       style={styles.modal}
     >
       <View style={styles.container}>

@@ -9,6 +9,7 @@ import { useTheme } from '@/theme/useTheme';
 import { WEEK_DAY_NAMES } from '@/i18n/weekDays';
 import { useTranslation } from 'react-i18next';
 import { MONTH_NAMES } from '@/i18n/months';
+import { useAgenda } from '@/agenda/hooks/AgendaProvider';
 
 
 interface MonthViewProps {
@@ -29,6 +30,7 @@ function MonthPage({ date, engine }: { date: Date; engine: CalendarEngine }) {
   const today = new Date();
   const theme = useTheme();
   const { config } = useAppConfig();
+  const { eventsByDay } = useAgenda();
 
   const days = engine.getMonthGridByDate(date);
   const currentMonth = date.getMonth();
@@ -36,6 +38,13 @@ function MonthPage({ date, engine }: { date: Date; engine: CalendarEngine }) {
   const firstDayIndex = days.findIndex((d) => d.getDate() === 1 && d.getMonth() === currentMonth);
 
   const firstDayRow = Math.floor(firstDayIndex / 7);
+
+  // 获取某天的事件数量（最多显示3个点）
+  const getEventCount = (day: Date) => {
+    const key = format(day, 'yyyy-MM-dd');
+    const events = eventsByDay[key];
+    return events ? Math.min(events.length, 3) : 0;
+  };
 
   return (
     <View style={styles.monthPage}>
@@ -49,6 +58,7 @@ function MonthPage({ date, engine }: { date: Date; engine: CalendarEngine }) {
         {days.map((day) => {
           const isCurrentMonth = day.getMonth() === currentMonth;
           const isToday = day.toDateString() === today.toDateString();
+          const eventCount = getEventCount(day);
 
           return (
             <View
@@ -68,8 +78,27 @@ function MonthPage({ date, engine }: { date: Date; engine: CalendarEngine }) {
               >
                 {day.getDate()}
               </Text>
-              {/* 日程占位区域（现在空着） */}
-              <View style={styles.eventPlaceholder} />
+              {/* 事件标记点 */}
+              <View style={styles.eventContainer}>
+                {eventCount > 0 && (
+                  <View style={styles.eventDots}>
+                    {Array.from({ length: Math.min(eventCount, 3) }).map((_, i) => (
+                      <View
+                        key={i}
+                        style={[
+                          styles.eventDot,
+                          { backgroundColor: theme.primary }
+                        ]}
+                      />
+                    ))}
+                    {eventCount > 3 && (
+                      <Text style={[styles.moreEvents, { color: theme.primary }]}>
+                        +{eventCount - 3}
+                      </Text>
+                    )}
+                  </View>
+                )}
+              </View>
             </View>
           );
         })}
@@ -245,9 +274,29 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  eventPlaceholder: {
-    flex: 1, // 占据剩余空间
+  eventContainer: {
+    flex: 1,
     marginTop: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 12,
+  },
+  eventDots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 3,
+    flexWrap: 'wrap',
+  },
+  eventDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+  },
+  moreEvents: {
+    fontSize: 8,
+    fontWeight: '600',
+    marginLeft: 2,
   },
 
   notCurrentMonth: {
